@@ -1,8 +1,38 @@
 import numpy
-
 import random
 import os
 import sys
+import math
+import string
+import collections
+
+X_train, X_cv, X_test = None, None, None
+Y_train, Y_cv, Y_test = None, None, None
+
+def loaddata(directory):
+    global X_train, X_cv, X_test, Y_train, Y_cv, Y_test
+
+    if not X_train:
+        X, y = _extract_data(directory)
+
+        # 60% of data is for training
+        mainlen, otherlen = math.floor(0.6 * len(X)), math.ceil(0.2 * len(X))
+
+        X_train, X_cv, X_test = X[0:mainlen], X[mainlen:mainlen + otherlen], X[mainlen + otherlen:]
+
+        Y = _multify(y)
+        Y_train, Y_cv, Y_test = Y[0:mainlen], Y[mainlen:mainlen + otherlen], Y[mainlen + otherlen:]
+
+    return collections.namedtuple('Data', 'X_train X_cv X_test Y_train Y_cv Y_test')(X_train, X_cv, X_test, Y_train, Y_cv, Y_test)
+
+def _multify(y):
+    ynew = numpy.zeros((len(y), 26)) # 26 letters of the alphabet
+    alphabet = string.ascii_lowercase
+
+    for i in range(len(y)):
+        index = alphabet.find(y[i])
+        ynew[i, index] = 1
+    return ynew
 
 def _extract_data(directory):
     # Load data into example vector
@@ -29,11 +59,15 @@ def _extract_data(directory):
 
             # Copy over columns
             for j in range(len(example) - 1):
-                X[row][j] = example[j]
+                X[row, j] = example[j]
 
     data.close()
 
     return (X, y)
 
 if __name__ == '__main__':
-    (X, y) = _extract_data(sys.argv[1])
+    data = loaddata(sys.argv[1])
+    print(len(data.X_train))
+    print(len(data.X_cv))
+    print(len(data.X_test))
+    print(Y_train[0])

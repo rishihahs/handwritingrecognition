@@ -42,7 +42,7 @@ def _extract_data(directory):
     keys.sort() # Super slow if not sorted
 
     # Create m x n array
-    X = numpy.empty((len(data[keys[0]]) * len(keys), len(data[keys[0]][0])), dtype=numpy.uint8)
+    X = numpy.empty((len(data[keys[0]]) * len(keys), len(data[keys[0]][0])), dtype=numpy.float64)
     y = numpy.empty(len(X), dtype=numpy.object)
 
     coordinates = set() # store used coordinates to avoid collisions
@@ -50,7 +50,7 @@ def _extract_data(directory):
     for key in keys:
         for example in data[key]:
             # Choose random row
-            row = random.randint(0, len(X) - 1)
+            row = numpy.random.randint(0, len(X))
             while row in coordinates:
                 row = (row + 1) % (len(X) - 1)
             coordinates.add(row)
@@ -59,7 +59,7 @@ def _extract_data(directory):
 
             # Copy over columns
             for j in range(len(example) - 1):
-                X[row, j] = example[j]
+                X[row, j] = 2 * example[j] / 255 - 1 # Multiply by 2/255 - 1 to get the intensity value
 
     data.close()
 

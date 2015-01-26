@@ -24,14 +24,14 @@ class NeuralNetwork(object):
         z = [None] # First element is None, since z starts at layer 2
 
         a1 = self.X
-        a1 = numpy.hstack((a1, numpy.ones((a1.shape[0], 1), dtype=a1.dtype))) # Prepend columns with ones
+        a1 = numpy.hstack((numpy.ones((a1.shape[0], 1), dtype=a1.dtype),  a1)) # Prepend columns with ones
         a.append(a1)
 
         for i in range(len(self.Theta)):
             zcurrent = numpy.dot(a[i], numpy.transpose(self.Theta[i]))
             z.append(zcurrent)
             acurrent = self.__sigmoid(zcurrent)
-            acurrent = numpy.hstack((acurrent, numpy.ones((acurrent.shape[0], 1), dtype=acurrent.dtype))) # Prepend columns with ones
+            acurrent = numpy.hstack((numpy.ones((acurrent.shape[0], 1), dtype=acurrent.dtype),  acurrent)) # Prepend columns with ones
             a.append(acurrent)
 
         return (a, z)
@@ -39,6 +39,10 @@ class NeuralNetwork(object):
     def __sigmoid(self, z):
         return 1 / (1 + numpy.exp(-1 * z))
 
+    def prints(self):
+        print(self.__forwardpropogation())
+
 if __name__ == '__main__':
     stuff = data.loaddata(sys.argv[1])
     neuralnetwork = NeuralNetwork([532, 53, 26], stuff.X_train, stuff.Y_train)
+    neuralnetwork.prints()

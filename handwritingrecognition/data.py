@@ -39,27 +39,27 @@ def __extract_data(directory):
     data = numpy.load(os.path.abspath(directory))
 
     keys = data.keys()
-    keys.sort() # Super slow if not sorted
+    keys.sort()
 
     # Create m x n array
     X = numpy.empty((len(data[keys[0]]) * len(keys), len(data[keys[0]][0])), dtype=numpy.float64)
     y = numpy.empty(len(X), dtype=numpy.object)
 
-    coordinates = set() # store used coordinates to avoid collisions
+    coordinates = list(range(len(X))) # store used coordinates to avoid collisions
+    random.shuffle(coordinates)
 
+    count = 0
     for key in keys:
         for example in data[key]:
             # Choose random row
-            row = numpy.random.randint(0, len(X))
-            while row in coordinates:
-                row = (row + 1) % (len(X) - 1)
-            coordinates.add(row)
+            row = coordinates[count]
+            count += 1
 
             y[row] = key
 
             # Copy over columns
             for j in range(len(example) - 1):
-                X[row, j] = 2 * example[j] / 255 - 1 # Multiply by 2/255 - 1 to get the intensity value
+                X[row, j] = (1 - (-26)) * example[j] / 255 - 26 # Multiply by 2/255 - 1 to get the intensity value
 
     data.close()
 

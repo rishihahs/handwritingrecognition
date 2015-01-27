@@ -1,4 +1,5 @@
 import numpy
+from scipy import optimize
 import math
 import sys
 
@@ -19,10 +20,40 @@ class NeuralNetwork(object):
             epsilon = math.sqrt(6) / math.sqrt(layers[i] + layers[i + 1]) # Statistically good epsilon
             self.Theta.append((2 * epsilon) * numpy.random.random_sample((layers[i + 1], layers[i] + 1)) - epsilon) # Randomized Theta
 
+        # Forward propogation memoization
+        self.memoizeforward = {}
+
+    def train(self):
+        # output = optimize.check_grad((lambda x: self.__cost(*self.__forwardpropogation(self.__reroll(x, self.Theta)))),
+        #                             (lambda x: self.__backpropogation(*self.__forwardpropogation(self.__reroll(x, self.Theta)))),
+        #                             self.__unroll(self.Theta))
+        output = optimize.fmin_l_bfgs_b((lambda x: self.__cost(*self.__forwardpropogation(self.X, self.__reroll(x, self.Theta)))),
+                                        self.__unroll(self.Theta),
+                                        (lambda x: self.__backpropogation(*self.__forwardpropogation(self.X, self.__reroll(x, self.Theta)))),
+                                        maxiter = 600)
+
+        return output
+
+    def __reroll(self, unrolled, target):
+        arr = []
+        pos = 0
+        for element in target:
+            arr.append(unrolled[pos:pos+element.size].reshape(element.shape))
+            pos += element.size
+        return arr
+
+    def __unroll(self, matarray):
+        newcpy = []
+        for m in matarray:
+            newcpy.append(m.ravel())
+        return numpy.concatenate(newcpy)
+
     def __cost(self, a, z):
         J = numpy.sum(-1 * self.Y * numpy.log(a[-1]))
         J = J + numpy.sum(-1 * (1 - self.Y) * numpy.log(1 - a[-1]))
         J = 1/self.X.shape[0] * J
+
+        print(J)
 
         return J
 
@@ -37,27 +68,45 @@ class NeuralNetwork(object):
             shapeddelta = numpy.transpose(1/self.X.shape[0] * numpy.dot(numpy.transpose(a[i]), delta[i]))
             Delta.append(shapeddelta.ravel())
 
-        return Delta
+        return numpy.concatenate(Delta)
 
-    def __forwardpropogation(self):
+    def __forwardpropogation(self, X, Theta):
+        hashkey = hash(str(Theta))
+        if hashkey in self.memoizeforward:
+            val = self.memoizeforward[hashkey]
+            del self.memoizeforward[hashkey]
+            return val
+
         a = []
         z = [None] # First element is None, since z starts at layer 2
 
-        a1 = self.X
+        a1 = X
         a1 = numpy.hstack((numpy.ones((a1.shape[0], 1), dtype=numpy.float64),  a1)) # Prepend columns with ones
         a.append(a1)
 
-        for i in range(len(self.Theta)):
-            zcurrent = numpy.dot(a[i], numpy.transpose(self.Theta[i]))
+        for i in range(len(Theta)):
+            zcurrent = numpy.dot(a[i], numpy.transpose(Theta[i]))
             z.append(zcurrent)
             acurrent = self.__sigmoid(zcurrent)
 
-            if i < len(self.Theta) - 1:
+            if i < len(Theta) - 1:
                 acurrent = numpy.hstack((numpy.ones((acurrent.shape[0], 1), dtype=acurrent.dtype),  acurrent)) # Prepend columns with ones
 
             a.append(acurrent)
 
-        return (a, z)
+        retval = (a, z)
+        self.memoizeforward[hashkey] = retval
+
+        return retval
+
+    def fp(self, X, Theta):
+        print(len(X))
+        print(X.shape)
+        print()
+        return self.__forwardpropogation(X, Theta)
+
+    def roll(self, unrolled, target):
+        return self.__reroll(unrolled, target)
 
     def __sigmoid(self, z):
         return 1 / (1 + numpy.exp(-1 * z))
@@ -66,10 +115,14 @@ class NeuralNetwork(object):
         g = self.__sigmoid(z)
         return g * (1 - g)
 
-    def prints(self):
-        print(self.__backpropogation(*self.__forwardpropogation()))
-
 if __name__ == '__main__':
     stuff = data.loaddata(sys.argv[1])
-    neuralnetwork = NeuralNetwork([532, 53, 26], stuff.X_train, stuff.Y_train)
-    neuralnetwork.prints()
+    print('Loaded Data')
+    neuralnetwork = NeuralNetwork([63, 36, 26], stuff.X_train, stuff.Y_train)
+    # neuralnetwork = NeuralNetwork([5, 3], numpy.array([[0.0312, 0.1392, 0.0246], [0.01342, 0.1322, 0.023456], [0.02943, 0.1632, 0.04654], [0.02333, 0.124352, 0.023432]]), numpy.array([[0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]]))
+    output = neuralnetwork.train()
+
+    print('Testing')
+
+    print(neuralnetwork.fp(stuff.X_cv[-3:-2], neuralnetwork.roll(output[0], neuralnetwork.Theta))[0][-1])
+    print(stuff.Y_cv[-3:-2])

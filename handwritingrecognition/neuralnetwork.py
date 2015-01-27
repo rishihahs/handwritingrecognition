@@ -99,15 +99,6 @@ class NeuralNetwork(object):
 
         return retval
 
-    def fp(self, X, Theta):
-        print(len(X))
-        print(X.shape)
-        print()
-        return self.__forwardpropogation(X, Theta)
-
-    def roll(self, unrolled, target):
-        return self.__reroll(unrolled, target)
-
     def __sigmoid(self, z):
         return 1 / (1 + numpy.exp(-1 * z))
 
@@ -123,6 +114,3 @@ if __name__ == '__main__':
     output = neuralnetwork.train()
 
     print('Testing')
-
-    print(neuralnetwork.fp(stuff.X_cv[-3:-2], neuralnetwork.roll(output[0], neuralnetwork.Theta))[0][-1])
-    print(stuff.Y_cv[-3:-2])

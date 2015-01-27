@@ -19,14 +19,14 @@ class NeuralNetwork(object):
             epsilon = math.sqrt(6) / math.sqrt(layers[i] + layers[i + 1]) # Statistically good epsilon
             self.Theta.append((2 * epsilon) * numpy.random.random_sample((layers[i + 1], layers[i] + 1)) - epsilon) # Randomized Theta
 
-    def cost(self, a, z):
+    def __cost(self, a, z):
         J = numpy.sum(-1 * self.Y * numpy.log(a[-1]))
         J = J + numpy.sum(-1 * (1 - self.Y) * numpy.log(1 - a[-1]))
         J = 1/self.X.shape[0] * J
 
         return J
 
-    def backpropogation(self, a, z):
+    def __backpropogation(self, a, z):
         delta = [a[-1] - self.Y]
         for i in range(len(z) - 2):
             dot = numpy.dot(delta[0], numpy.delete(self.Theta[-1 - i], 0, 1))
@@ -39,7 +39,7 @@ class NeuralNetwork(object):
 
         return Delta
 
-    def forwardpropogation(self, Theta):
+    def __forwardpropogation(self):
         a = []
         z = [None] # First element is None, since z starts at layer 2
 
@@ -47,12 +47,12 @@ class NeuralNetwork(object):
         a1 = numpy.hstack((numpy.ones((a1.shape[0], 1), dtype=numpy.float64),  a1)) # Prepend columns with ones
         a.append(a1)
 
-        for i in range(len(Theta)):
-            zcurrent = numpy.dot(a[i], numpy.transpose(Theta[i]))
+        for i in range(len(self.Theta)):
+            zcurrent = numpy.dot(a[i], numpy.transpose(self.Theta[i]))
             z.append(zcurrent)
             acurrent = self.__sigmoid(zcurrent)
 
-            if i < len(Theta) - 1:
+            if i < len(self.Theta) - 1:
                 acurrent = numpy.hstack((numpy.ones((acurrent.shape[0], 1), dtype=acurrent.dtype),  acurrent)) # Prepend columns with ones
 
             a.append(acurrent)
@@ -67,39 +67,9 @@ class NeuralNetwork(object):
         return g * (1 - g)
 
     def prints(self):
-        print(self.__backpropogation())
+        print(self.__backpropogation(*self.__forwardpropogation()))
 
 if __name__ == '__main__':
-    # stuff = data.loaddata(sys.argv[1])
-    # neuralnetwork = NeuralNetwork([532, 53, 26], stuff.X_train, stuff.Y_train)
-    # neuralnetwork.prints()
-    neuralnetwork = NeuralNetwork([5, 3], numpy.array([[0.0312, 0.1392, 0.0246], [0.01342, 0.1322, 0.023456], [0.02943, 0.1632, 0.04654], [0.02333, 0.124352, 0.023432]]), numpy.array([[0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]]))
-    thetas = neuralnetwork.Theta
-    thetavals = []
-    for i in range(len(thetas)):
-        thetavals.append(thetas[i].ravel())
-    Theta = numpy.concatenate(thetavals)
-
-    e = 1e-4
-    gradapprox = []
-    for p in range(len(Theta)):
-        thetaplus = numpy.copy(Theta)
-        thetaplus[p] = thetaplus[p] + e
-        thetaminus = numpy.copy(Theta)
-        thetaminus[p] = thetaminus[p] - e
-        thetagradp = []
-        thetagradm = []
-        lastsize = 0
-        print(thetaplus[p])
-        print(thetaminus[p])
-        for i in range(len(neuralnetwork.Theta)):
-            t = neuralnetwork.Theta[i]
-            thetagradp.append(thetaplus[lastsize:lastsize+t.size].reshape(t.shape))
-            thetagradm.append(thetaminus[lastsize:lastsize+t.size].reshape(t.shape))
-            lastsize = lastsize + t.size
-        gradapprox.append((neuralnetwork.cost(*neuralnetwork.forwardpropogation(thetagradp)) - neuralnetwork.cost(*neuralnetwork.forwardpropogation(thetagradm))) / (2 * e))
-
-    real = numpy.concatenate(neuralnetwork.backpropogation(*neuralnetwork.forwardpropogation(neuralnetwork.Theta)))
-
-    for i in range(len(gradapprox)):
-        print([gradapprox[i], real[i]])
+    stuff = data.loaddata(sys.argv[1])
+    neuralnetwork = NeuralNetwork([532, 53, 26], stuff.X_train, stuff.Y_train)
+    neuralnetwork.prints()

@@ -18,7 +18,7 @@ def learningcurves(layers, X_train, Y_train, X_cv, Y_cv, lambda_regularization):
                                Y_train[(trainlen - trainlen/(i + 1)):],
                                      Theta,
                                      lambda_regularization,
-                                     maxiter = 63)
+                                     maxiterations = 63)
         trainplotx.append(trainlen/(i + 1))
         trainploty.append(output[1])
 

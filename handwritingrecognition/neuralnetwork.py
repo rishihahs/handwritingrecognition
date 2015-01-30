@@ -19,11 +19,11 @@ def randomtheta(layers, num_features):
 
     return Theta
 
-def train(X, Y, Theta, lambda_regularization, maxiter = 600):
+def train(X, Y, Theta, lambda_regularization, maxiterations = 600):
     output = optimize.fmin_l_bfgs_b((lambda x: __min_cost(x, X, Y, Theta, lambda_regularization)),
                                     __unroll(Theta),
                                     (lambda x: __min_gradient(x, X, Y, Theta, lambda_regularization)),
-                                    maxiter)
+                                    maxiter = maxiterations)
     return output
 
 def __min_cost(x, X, Y, Theta, lambda_regularization):

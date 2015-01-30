@@ -13,11 +13,12 @@ def learningcurves(layers, X_train, Y_train, X_cv, Y_cv, lambda_regularization):
 
     trainlen = len(X_train)
     for i in reversed(range(30)):
-        Theta = neuralnetwork.randomtheta(layers, X_train.shape[1], maxiter = 63)
+        Theta = neuralnetwork.randomtheta(layers, X_train.shape[1])
         output = neuralnetwork.train(X_train[(trainlen - trainlen/(i + 1)):],
                                Y_train[(trainlen - trainlen/(i + 1)):],
                                      Theta,
-                                     lambda_regularization)
+                                     lambda_regularization,
+                                     maxiter = 63)
         trainplotx.append(trainlen/(i + 1))
         trainploty.append(output[1])
 

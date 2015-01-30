@@ -7,7 +7,7 @@ import data
 
 __memoizeforward = {} # Memoize forwardpropogation
 
-def randomtheta(layers, num_features, maxiter = 600):
+def randomtheta(layers, num_features):
     # Create Theta
     Theta = []
     layers = list(layers)
@@ -19,7 +19,7 @@ def randomtheta(layers, num_features, maxiter = 600):
 
     return Theta
 
-def train(X, Y, Theta, lambda_regularization):
+def train(X, Y, Theta, lambda_regularization, maxiter = 600):
     output = optimize.fmin_l_bfgs_b((lambda x: __min_cost(x, X, Y, Theta, lambda_regularization)),
                                     __unroll(Theta),
                                     (lambda x: __min_gradient(x, X, Y, Theta, lambda_regularization)),

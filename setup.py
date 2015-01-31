@@ -4,6 +4,10 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
+# Get the long description from the relevant file
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(
     name='handwritingrecognition',
 
@@ -13,9 +17,10 @@ setup(
     version='1.0.0',
 
     description='Recognize handwriting with machine learning',
+    long_description=long_description,
 
     # The project's main homepage.
-    # url='https://github.com/pypa/sampleproject',
+    url='https://github.com/rishihahs/handwritingrecognition',
 
     # Author details
     author='Rishi Shah',

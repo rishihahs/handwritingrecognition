@@ -12,7 +12,7 @@ def main():
     Theta = neuralnetwork.randomtheta([63, 63, 26], stuff.X_train.shape[1])
 
     print('Training...')
-    output = neuralnetwork.train(stuff.X_train, stuff.Y_train, Theta, 0.16, maxiterations = 12)
+    output = neuralnetwork.train(stuff.X_train, stuff.Y_train, Theta, 0.16, maxiterations = 1233)
 
     # Save correct Thetas
     print('Saving Thetas...')

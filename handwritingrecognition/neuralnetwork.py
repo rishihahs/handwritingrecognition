@@ -3,7 +3,7 @@ from scipy import optimize
 import math
 import sys
 
-import data
+from handwritingrecognition import data
 
 __memoizeforward = {} # Memoize forwardpropogation
 
@@ -20,11 +20,14 @@ def randomtheta(layers, num_features):
     return Theta
 
 def train(X, Y, Theta, lambda_regularization, maxiterations = 600):
-    output = optimize.fmin_l_bfgs_b((lambda x: __min_cost(x, X, Y, Theta, lambda_regularization)),
-                                    __unroll(Theta),
-                                    (lambda x: __min_gradient(x, X, Y, Theta, lambda_regularization)),
-                                    maxiter = maxiterations)
-    return output
+    out = optimize.fmin_l_bfgs_b((lambda x: __min_cost(x, X, Y, Theta, lambda_regularization)),
+                                 __unroll(Theta),
+                                 (lambda x: __min_gradient(x, X, Y, Theta, lambda_regularization)),
+                                 maxiter = maxiterations)
+
+    output = list(out)
+    output[0] = __reroll(out[0], Theta) # Reroll correct Thetas
+    return tuple(output)
 
 def __min_cost(x, X, Y, Theta, lambda_regularization):
     rerolled = __reroll(x, Theta)
@@ -128,17 +131,3 @@ def __sigmoid(z):
 def __sigmoidGradient(z):
     g = __sigmoid(z)
     return g * (1 - g)
-
-if __name__ == '__main__':
-    stuff = data.loaddata(sys.argv[1])
-    print('Loaded Data')
-    # neuralnetwork = NeuralNetwork([63, 36, 26], stuff.X_train, stuff.Y_train)
-    # X = numpy.array([[0.0312, 0.1392, 0.0246], [0.01342, 0.1322, 0.023456], [0.02943, 0.1632, 0.04654], [0.02333, 0.124352, 0.023432]])
-    # Y = numpy.array([[0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]])
-    # Theta = randomtheta([5, 3], X.shape[1])
-    # lambda_regularization = 0.2
-    # output = optimize.check_grad((lambda x: __min_cost(x, X, Y, Theta, lambda_regularization)),
-    #                             (lambda x: __min_gradient(x, X, Y, Theta, lambda_regularization)),
-    #                             __unroll(Theta))
-
-    # print(output)

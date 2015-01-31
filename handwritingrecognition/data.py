@@ -64,10 +64,3 @@ def __extract_data(directory):
     data.close()
 
     return (X, y)
-
-if __name__ == '__main__':
-    data = loaddata(sys.argv[1])
-    print(len(data.X_train))
-    print(len(data.X_cv))
-    print(len(data.X_test))
-    print(Y_train[0])

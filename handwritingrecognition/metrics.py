@@ -18,7 +18,7 @@ def learningcurves(layers, X_train, Y_train, X_cv, Y_cv, lambda_regularization):
                                Y_train[(trainlen - trainlen/(i + 1)):],
                                      Theta,
                                      lambda_regularization,
-                                     maxiterations = 63)
+                                     maxiterations = 233)
         trainplotx.append(trainlen/(i + 1))
         trainploty.append(output[1])
 
@@ -42,7 +42,8 @@ def lambda_check(layers, X_train, Y_train, X_cv, Y_cv):
         output = neuralnetwork.train(X_train,
                                      Y_train,
                                      Theta,
-                                     lambda_regularization)
+                                     lambda_regularization,
+                                     maxiterations = 233)
 
         cost = neuralnetwork.calculatecost(X_cv, Y_cv, output[0], Theta, 0)
         costs.append(cost)
@@ -56,5 +57,5 @@ def lambda_check(layers, X_train, Y_train, X_cv, Y_cv):
 
 if __name__ == '__main__':
     stuff = data.loaddata(sys.argv[1])
-    learningcurves([63, 36, 26], stuff.X_train, stuff.Y_train, stuff.X_cv, stuff.Y_cv, 0.16)
-    # lambda_check([63, 36, 26], stuff.X_train, stuff.Y_train, stuff.X_cv, stuff.Y_cv)
+    # learningcurves([63, 63, 26], stuff.X_train, stuff.Y_train, stuff.X_cv, stuff.Y_cv, 0.16)
+    lambda_check([63, 63, 26], stuff.X_train, stuff.Y_train, stuff.X_cv, stuff.Y_cv)
